@@ -49,3 +49,17 @@ print(get_random_secret_key())
 ## Move environment variable from source to .env file 
 
 *Install python-dotenv*
+
+## Implement models for database structure
+
+Create migrations for core app:
+
+>python manage.py makemigrations core
+
+Apply them to the database: 
+
+>python manage.py migrate
+
+## Create super user
+
+>python manage.py createsuperuser

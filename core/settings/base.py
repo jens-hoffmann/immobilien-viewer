@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # External Apps
     'rest_framework',
+    'django_bootstrap5',
     # Internal Apps
+    'core',
     'CollectImmobilien',
     'ImmobilienViewer',
 
@@ -69,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'ImmobilienViewer.context_processors.regions_to_base',
             ],
         },
     },
