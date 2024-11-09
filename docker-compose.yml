@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+
+  broker:
+    image: redis:7-alpine
+
+  web:
+    container_name: web
+    build:
+      context: .
+    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - app:/app
+    ports:
+      - 8001:8000
+    environment:
+      - DEBUG=1
+    depends_on:
+      - broker
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+    volumes:
+      - app:/app
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=0930jd30j9jd09j09j109fj01j9f
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+    depends_on:
+      - broker
+volumes:
+  app:
+    driver: local
+    driver_opts:
+        o: bind
+        type: none
+        device: .

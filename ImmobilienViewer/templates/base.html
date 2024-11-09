@@ -17,22 +17,33 @@
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{% url 'immoviewer:homepage' %}">Home</a>
+
+              <a class="nav-link {% if active == 'home' %}active{% endif %}" aria-current="page" href="{% url 'immoviewer:homepage' %}">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'immoviewer:immo-list' %}">List</a>
+              <a class="nav-link {% if active == 'list' %}active{% endif %}" href="{% url 'immoviewer:immo-list' %}">List</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link {% if active == 'list-by-region' %}active{% endif %} dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 List by region
               </a>
               <ul class="dropdown-menu">
                 {% for region in regionen %}
-                <li><a class="dropdown-item" href="{% url 'immoviewer:immo-list-by-region' pk=region.pk %}">{{region.name}}</a></li>
+                <li><a class="dropdown-item" href="{% url 'immoviewer:immo-list-by-region' uuid=region.uuid %}">{{region.name}}</a></li>
                 {% endfor %}
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link {% if active == 'create' %}active{% endif %} dropdown-toggle" href="#" ole="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Create
+              </a>
+                <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'immoviewer:immo-create-region' %}">Region</a></li>
+                <li><a class="dropdown-item" href="{% url 'immoviewer:immo-create-tag' %}">Tag</a></li>
+                <li><a class="dropdown-item" href="{% url 'immoviewer:immo-create-immobilie' %}">Immobilie</a></li>
               </ul>
             </li>
             <li class="nav-item">

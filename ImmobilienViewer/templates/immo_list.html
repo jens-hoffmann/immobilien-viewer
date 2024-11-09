@@ -13,7 +13,7 @@
             <div class="row">
                 {% for immobilie in immobilien %}
                 <div class="col-md-4">
-                    <a class="text-dark" href="{% url 'immoviewer:immo-detail' pk=immobilie.pk %}">
+                    <a class="text-dark" href="{% url 'immoviewer:immo-detail' immobilie.uuid %}">
                         <div class="card mb-4 box-shadow">
                             <div class="card-body">
                                 <h2 style="font-size:18px;font-weight:bold;min-height:42px;">
