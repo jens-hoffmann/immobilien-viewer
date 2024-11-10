@@ -12,4 +12,10 @@ elif app_environment == "PRODUCTION":
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.production')
 
 app = Celery("CollectImmobilien")
-app.conf.from_object("django.conf:settings", namespace="CELERY")
+app.config_from_object("django.conf:settings", namespace="CELERY")
+
+@app.task
+def add_numbers():
+    return
+
+app.autodiscover_tasks()

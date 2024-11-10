@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  broker:
+  redis:
     image: redis:7-alpine
 
   web:
@@ -17,20 +17,21 @@ services:
     environment:
       - DEBUG=1
     depends_on:
-      - broker
+      - redis
 
   celery:
     container_name: celery
     build:
       context: .
+    command: celery -A CollectImmobilien worker -l INFO
     volumes:
       - app:/app
     environment:
       - DEBUG=1
-      - SECRET_KEY=0930jd30j9jd09j09j109fj01j9f
+
       - ALLOWED_HOSTS=localhost,127.0.0.1
     depends_on:
-      - broker
+      - redis
 volumes:
   app:
     driver: local
