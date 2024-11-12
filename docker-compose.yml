@@ -5,8 +5,8 @@ services:
   redis:
     image: redis:7-alpine
 
-  web:
-    container_name: web
+  django:
+    container_name: django
     build:
       context: .
     command: sh -c "python manage.py runserver 0.0.0.0:8000"
@@ -28,10 +28,23 @@ services:
       - app:/app
     environment:
       - DEBUG=1
-
+      - SECRET_KEY=0930jd30j9jd09j09j109fj01j9f
       - ALLOWED_HOSTS=localhost,127.0.0.1
     depends_on:
       - redis
+      - django
+
+  celeryworker:
+    container_name: celeryworker
+    build:
+      context: ./celeryworker
+    command: celery -A celerytasks worker -l INFO
+    volumes:
+      - celery:/app
+    depends_on:
+      - redis
+      - django
+
 volumes:
   app:
     driver: local
@@ -39,3 +52,9 @@ volumes:
         o: bind
         type: none
         device: .
+  celery:
+    driver: local
+    driver_opts:
+        o: bind
+        type: none
+        device: ./celeryworker
