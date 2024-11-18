@@ -13,8 +13,8 @@ services:
     image: rabbitmq:management
     container_name: rabbitmq
     ports:
-     - 5672:5672
-     - 15672:15672
+     - "5672:5672"
+     - "15672:15672"
 
   redis:
     image: redis:7-alpine
@@ -33,6 +33,7 @@ services:
       - ALLOWED_HOSTS=django,localhost,127.0.0.1
     depends_on:
       - redis
+      - db
 
   celeryworker:
     container_name: celeryworker
@@ -48,6 +49,23 @@ services:
       - django
       - rabbitmq
 
+  db:
+    image: postgres:16-alpine
+    container_name: db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+  selenium:
+    image: selenium/standalone-chrome
+    container_name: selenium
+    shm_size: 2gb
+    environment:
+      - SE_ENABLE_TRACING=false
+    ports:
+     - "4444:4444"
+
 volumes:
   app:
     driver: local
@@ -61,3 +79,5 @@ volumes:
         o: bind
         type: none
         device: ./celeryworker
+  db-data:
+    driver: local

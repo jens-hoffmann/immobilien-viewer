@@ -7,5 +7,5 @@ class ImmobilienSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Immobilie
-        fields = ['uuid', 'title', 'description', 'provider', 'price', 'url', 'location']
+        fields = ['uuid', 'title', 'description', 'provider', 'provider_id', 'price', 'url', 'location']
         read_only_fields = ['uuid']
