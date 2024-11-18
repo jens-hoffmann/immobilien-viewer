@@ -1,6 +1,8 @@
 from django.db.models.query import EmptyQuerySet
 from django.views.generic import DetailView, ListView, CreateView
+from rest_framework import viewsets
 
+from ImmobilienViewer import serializers
 from ImmobilienViewer.forms import AddRegionForm, AddImmobilieForm, AddTagForm
 from core.models import Immobilie, Region, Tag
 
@@ -62,3 +64,8 @@ class CreateTagView(CreateView):
     template_name = 'create.html'
     success_url = '/immoviewer/list/'
     extra_context = {'title': 'Create a new tag', 'active': 'create'}
+
+class ImmobilienAPIView(viewsets.ModelViewSet):
+
+    serializer_class = serializers.ImmobilienSerializer
+    queryset = Immobilie.objects.all()

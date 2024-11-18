@@ -63,3 +63,13 @@ Apply them to the database:
 ## Create super user
 
 >python manage.py createsuperuser
+
+## Celery commands
+
+Show registered tasks
+
+>celery inspect registered
+
+Start tasks
+
+>celery call app.tasks.update_something

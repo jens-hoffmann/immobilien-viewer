@@ -2,6 +2,20 @@ version: '3.8'
 
 services:
 
+  flower:
+    image: mher/flower
+    ports:
+      - 5555:5555
+    env_file:
+      - .env
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+     - 5672:5672
+     - 15672:15672
+
   redis:
     image: redis:7-alpine
 
@@ -16,34 +30,23 @@ services:
       - 8001:8000
     environment:
       - DEBUG=1
+      - ALLOWED_HOSTS=django,localhost,127.0.0.1
     depends_on:
       - redis
-
-  celery:
-    container_name: celery
-    build:
-      context: .
-    command: celery -A CollectImmobilien worker -l INFO
-    volumes:
-      - app:/app
-    environment:
-      - DEBUG=1
-      - SECRET_KEY=0930jd30j9jd09j09j109fj01j9f
-      - ALLOWED_HOSTS=localhost,127.0.0.1
-    depends_on:
-      - redis
-      - django
 
   celeryworker:
     container_name: celeryworker
     build:
       context: ./celeryworker
-    command: celery -A celerytasks worker -l INFO
+    command: celery -A celerysetup worker -l INFO -Q celery,tasks,dead_letter -B
+    env_file:
+      - .env
     volumes:
       - celery:/app
     depends_on:
       - redis
       - django
+      - rabbitmq
 
 volumes:
   app:

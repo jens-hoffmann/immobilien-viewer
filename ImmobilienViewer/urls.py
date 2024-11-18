@@ -1,8 +1,13 @@
 from django.urls import path, include
 from django.views.generic import TemplateView
+from rest_framework.routers import DefaultRouter
 
 from .views import ImmobilienDetailView, ImmobilienListView, RegionListView, CreateRegionView, CreateImmobilieView, \
-    CreateTagView
+    CreateTagView, ImmobilienAPIView
+
+router = DefaultRouter()
+router.register('immobilie', ImmobilienAPIView)
+
 
 app_name = 'immoviewer'
 
@@ -13,6 +18,6 @@ urlpatterns = [
     path('createregion/', CreateRegionView.as_view(), name='immo-create-region'),
     path('createimmobilie/', CreateImmobilieView.as_view(), name='immo-create-immobilie'),
     path('createtag/', CreateTagView.as_view(), name='immo-create-tag'),
-    path('list-by-region/<uuid:uuid>/', RegionListView.as_view(), name='immo-list-by-region')
-
+    path('list-by-region/<uuid:uuid>/', RegionListView.as_view(), name='immo-list-by-region'),
+    path('api/', include(router.urls))
 ]
