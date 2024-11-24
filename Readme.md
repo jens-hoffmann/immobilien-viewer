@@ -73,3 +73,37 @@ Show registered tasks
 Start tasks
 
 >celery call app.tasks.update_something
+ 
+# OpenTelemetry
+
+* https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/django/django.html
+* https://github.com/open-telemetry/opentelemetry-python/tree/main/docs/examples/django
+* https://opentelemetry.io/docs/languages/python/
+* https://github.com/open-telemetry/opentelemetry-python/tree/main/docs/examples
+
+
+## Install dependencies
+
+```
+pip install opentelemetry-sdk
+pip install opentelemetry-instrumentation-django
+pip install opentelemetry-instrumentation-logging
+pip install opentelemetry-exporter-otlp
+pip install requests
+```
+
+add folowing lines to manage.py:
+
+```python
+from opentelemetry.instrumentation.django import DjangoInstrumentor
+
+DjangoInstrumentor().instrument(is_sql_commentor_enabled=True)
+```
+
+## Configure SDK
+
+https://opentelemetry.io/docs/languages/sdk-configuration/
+
+Set environment in docker-compose
+
+>opentelemetry-bootstrap --action=install

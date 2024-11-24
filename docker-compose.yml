@@ -23,7 +23,7 @@ services:
     container_name: django
     build:
       context: .
-    command: sh -c "python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py runserver 0.0.0.0:8000 --noreload"
     volumes:
       - app:/app
     ports:
@@ -31,6 +31,9 @@ services:
     environment:
       - DEBUG=1
       - ALLOWED_HOSTS=django,localhost,127.0.0.1
+      - OTEL_SERVICE_NAME=my-otel-service
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_LOG_LEVEL=DEBUG
     depends_on:
       - redis
       - db
@@ -65,6 +68,41 @@ services:
       - SE_ENABLE_TRACING=false
     ports:
      - "4444:4444"
+
+  prometheus:
+      image: prom/prometheus
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+      volumes:
+        - ./prometheus/:/etc/prometheus/
+      ports:
+        - 9090:9090
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    container_name: otel-collector
+    volumes:
+      - ./otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    ports:
+      - 1888:1888 # pprof extension
+      - 8888:8888 # Prometheus metrics exposed by the Collector
+      - 8889:8889 # Prometheus exporter metrics
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
+    depends_on:
+      - jaeger
+      - prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - 16686:16686
+      - 6831:6831
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
 
 volumes:
   app:
