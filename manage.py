@@ -10,16 +10,15 @@ from opentelemetry.instrumentation.logging import LoggingInstrumentor
 def main():
     load_dotenv()
 
-    app_environment = os.environ.get("APP_ENV", "LOCAL")
+    app_environment = os.environ.get("APP_ENV", "local")
 
     """Run administrative tasks."""
-    if app_environment == "LOCAL":
+    if app_environment == "local":
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.local')
-    elif app_environment == "PRODUCTION":
+    elif app_environment == "prod":
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.production')
-
-    DjangoInstrumentor().instrument(is_sql_commentor_enabled=True)
-    LoggingInstrumentor().instrument()
+        DjangoInstrumentor().instrument(is_sql_commentor_enabled=True)
+        LoggingInstrumentor().instrument()
 
     try:
         from django.core.management import execute_from_command_line

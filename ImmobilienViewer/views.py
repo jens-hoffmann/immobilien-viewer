@@ -1,8 +1,10 @@
 from django.db.models.query import EmptyQuerySet
 from django.views.generic import DetailView, ListView, CreateView
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 
 from ImmobilienViewer import serializers
+from ImmobilienViewer.exceptions import ImmoblilieExistsException
 from ImmobilienViewer.forms import AddRegionForm, AddImmobilieForm, AddTagForm
 from core.models import Immobilie, Region, Tag
 
@@ -69,3 +71,12 @@ class ImmobilienAPIView(viewsets.ModelViewSet):
 
     serializer_class = serializers.ImmobilienSerializer
     queryset = Immobilie.objects.all()
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            provider_list = self.queryset.filter(provider_id=serializer.validated_data.get('provider_id'))
+            if len(provider_list) > 0:
+                raise ImmoblilieExistsException
+            super().perform_create(serializer)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

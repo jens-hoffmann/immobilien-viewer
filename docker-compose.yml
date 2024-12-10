@@ -27,10 +27,11 @@ services:
     volumes:
       - app:/app
     ports:
-      - 8001:8000
+      - 8000:8000
     environment:
       - DEBUG=1
-      - ALLOWED_HOSTS=django,localhost,127.0.0.1
+      - APP_ENV=prod
+      - ALLOWED_HOSTS=django,localhost,127.0.0.1,0.0.0.0
       - OTEL_SERVICE_NAME=my-otel-service
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_LOG_LEVEL=DEBUG

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # External Apps
     'rest_framework',
+    'drf_standardized_errors',
     'django_bootstrap5',
     # Internal Apps
     'core',
@@ -128,36 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND")
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'trace_formatter': {
-            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s] [%(funcName)s] %(message)s',  # optional, default is logging.BASIC_FORMAT
-            'datefmt': '%Y-%m-%d %H:%M:%S',  # optional, default is '%Y-%m-%d %H:%M:%S'
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'WARNING',
-            'class': 'logging.FileHandler',
-            'formatter': 'trace_formatter',
-            'filename': 'webapp.log',
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'trace_formatter',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'WARNING',
-    },
+REST_FRAMEWORK = {
+    # other settings
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler"
 }
