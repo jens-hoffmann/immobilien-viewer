@@ -9,14 +9,15 @@ broker_connection_timeout = 60
 result_backend = 'redis://redis:6379/0'
 
 task_routes = {
-    'addimmobilie': {'queue': 'tasks'},
+    'zvg_scraping': {'queue': 'scrapingtasks'},
+    'postresult' : {'queue': 'posttasks'}
 }
 
 result_persistent = True
 
 beat_schedule = {
-    'addimmobilie': {
-        'task': 'addimmobilie',
+    'zvg_scraping': {
+        'task': 'zvg_scraping',
         'schedule': crontab(hour=3)
     }
 }

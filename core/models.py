@@ -1,6 +1,6 @@
 import uuid
-from django.db import models
 
+from django.db import models
 
 class Tag(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
@@ -32,6 +32,13 @@ class ImmobilienResource(models.Model):
 
 
 class Immobilie(models.Model):
+    PLOT = "plot"
+    HOUSE = "house"
+    IMMOBIEN_TYPES = {
+        PLOT: "plot",
+        HOUSE: "house",
+    }
+
     title = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(blank=True, null=False)
 
@@ -43,10 +50,12 @@ class Immobilie(models.Model):
     provider_id = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    type = models.CharField(max_length=10, choices=IMMOBIEN_TYPES)
 
     region = models.ForeignKey(Region, on_delete=models.PROTECT, null=True, blank=True)
     resource = models.ForeignKey(ImmobilienResource, on_delete=models.PROTECT, null=True, blank=True)
     tags = models.ManyToManyField('Tag', blank=True)
+
 
     def __str__(self):
         return self.title

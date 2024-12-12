@@ -1,4 +1,4 @@
-from tasks import add_immobilie
+from tasks import zvg_scraping
 
 if __name__ == '__main__':
-    add_immobilie.apply_async()
+    zvg_scraping.apply_async()
