@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from ImmobilienViewer import serializers
 from ImmobilienViewer.exceptions import ImmoblilieExistsException
 from ImmobilienViewer.forms import AddRegionForm, AddImmobilieForm, AddTagForm
-from core.models import Immobilie, Region, Tag
+from ImmobilienViewer.serializers import ImmobilienResourceSerializer
+from core.models import Immobilie, Region, Tag, ImmobilienResource
 
 
 class ImmobilienDetailView(DetailView):
@@ -23,7 +24,7 @@ class ImmobilienListView(ListView):
     model = Immobilie
     template_name = "immo_list.html"
     context_object_name = 'immobilien'
-    paginate_by = 1
+    paginate_by = 9
     queryset = Immobilie.objects.all()
     extra_context = {'active': 'list'}
 
@@ -72,11 +73,3 @@ class ImmobilienAPIView(viewsets.ModelViewSet):
     serializer_class = serializers.ImmobilienSerializer
     queryset = Immobilie.objects.all()
 
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            provider_list = self.queryset.filter(provider_id=serializer.validated_data.get('provider_id'))
-            if len(provider_list) > 0:
-                raise ImmoblilieExistsException
-            super().perform_create(serializer)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

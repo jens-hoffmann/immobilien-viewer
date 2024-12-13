@@ -6,8 +6,8 @@
 
     <div class="container">
         <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-            <h1 class="display-4">All Books</h1>
-            <p class="lead">A range of wonderful programming books to help you learn JavaScript.</p>
+            <h1 class="display-4">Alle Immobilien</h1>
+            <p class="lead">List of saved plot and house offers</p>
         </div>
         <div class="py-5">
             <div class="row">
@@ -18,10 +18,12 @@
                             <div class="card-body">
                                 <h2 style="font-size:18px;font-weight:bold;min-height:42px;">
                                     {{immobilie.title|truncatechars:50}}</h2>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">{{immobilie.description}}</small>
-                                </div>
-                                <small class="text-muted">{{time}}</small>
+                                <ul>
+                                    <li><small class="text-muted">Type: {{immobilie.type}}</small></li>
+                                    <li><small class="text-muted">Price: {{immobilie.price}}</small></li>
+                                    <li><small class="text-muted">Provider: {{immobilie.provider}}</small></li>
+                                    <li><small class="text-muted">Location: {{immobilie.location}}</small></li>
+                                </ul>
                             </div>
                         </div>
                     </a>

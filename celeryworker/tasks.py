@@ -58,13 +58,12 @@ def get_elements_from_table(driver, table):
     return immo_dict_list
 
 @celery_app.task(name='zvg_scraping', queue="scrapingtasks")
-def zvg_scraping():
+def zvg_scraping(state: str):
     url = 'https://www.zvg-portal.de/index.php?button=Termine%20suchen'
 
     selenium_service = os.environ.get('SELENIUM_SERVICE')
 
     driver = webdriver.Remote(selenium_service, options=webdriver.ChromeOptions())
-    state = 'Brandenburg'
     driver.get(url)
     select_state_element = driver.find_element(By.XPATH, "//select[@name='land_abk']")
     select_state_class = Select(select_state_element)
@@ -90,7 +89,6 @@ def zvg_scraping():
             pages = driver.find_elements(By.XPATH, "//table[1]/tbody/tr/td/button[@class='seiten_nr']")
             if pagenr == len(pages):
                 break
-            print(pages[pagenr].text)
             pages[pagenr].click()
             table = driver.find_element(By.XPATH, "//table[2]")
             immo_dict_list += get_elements_from_table(driver, table)
@@ -122,9 +120,14 @@ def zvg_scraping():
         payload['url'] = url
         payload['location'] = row_dict['Lage']
         payload['type'] = row_dict['Objekttyp']
-        print(payload)
+        payload['resource'] = {
+            "name": "ZVG-Portal",
+            "base_url": url,
+            "crawler": __name__
+        }
         postresult.delay(payload)
 
+        return f"Scraping {state} successful."
 
 @celery_app.task(name='postresult', queue="posttasks")
 def postresult(payload: dict):
@@ -135,4 +138,12 @@ def postresult(payload: dict):
     }
 
     response = requests.request("POST", url, json=payload, headers=headers)
+    if not response.status_code in list([201, 409]):
+        handle_failed_task.delay(payload)
+        raise Exception(f"Posting task failed with status {response.status_code}: {response.text}")
+    else:
+        return f"Post successful with status: {response.status_code}"
 
+@celery_app.task(name='handle_failed_task', queue='dead_letter')
+def handle_failed_task( payload: str):
+    return f"Failed task with payload: {payload}"
