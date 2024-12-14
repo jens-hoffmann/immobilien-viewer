@@ -1,3 +1,11 @@
+# Services
+
+Django: http://localhost:8000
+Prometheus: http://localhost:9090
+Grafana: http://localhost:3000
+RabbitMQ: http://localhost:15672
+JaegerUI: http://localhost:16686
+
 ## Create virtual environment
 
 >python -m venv .venv

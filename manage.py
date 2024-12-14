@@ -5,6 +5,7 @@ import sys
 from dotenv import load_dotenv
 from opentelemetry.instrumentation.django import DjangoInstrumentor
 from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 
 
 def main():
@@ -19,6 +20,7 @@ def main():
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.production')
         DjangoInstrumentor().instrument(is_sql_commentor_enabled=True)
         LoggingInstrumentor().instrument()
+        RequestsInstrumentor().instrument()
 
     try:
         from django.core.management import execute_from_command_line

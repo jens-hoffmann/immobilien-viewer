@@ -31,7 +31,7 @@ trace_provider.add_span_processor(processor)
 trace.set_tracer_provider(trace_provider)
 
 # Creates a tracer from the global tracer provider
-tracer = trace.get_tracer(__name__)
+tracer = trace.get_tracer("django-tracer")
 
 class ImmobilienviewerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'

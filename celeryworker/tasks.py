@@ -1,7 +1,10 @@
+import logging
 import os
 from collections import namedtuple
 
 import requests
+from opentelemetry import metrics, trace
+from opentelemetry.metrics import get_meter_provider
 
 from celerysetup import app as celery_app
 from selenium import webdriver
@@ -11,6 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 
+logger = logging.getLogger("celery.tasks")
 
 fields = ['Aktenzeichen', 'Amtsgericht', 'Objekt', 'Verkehrswert', 'Termin', 'Beschreibung']
 Immobilie = namedtuple("Immobilie", fields,
@@ -127,23 +131,37 @@ def zvg_scraping(state: str):
         }
         postresult.delay(payload)
 
-        return f"Scraping {state} successful."
+    return f"zvg_scraping for {state} successful."
 
 @celery_app.task(name='postresult', queue="posttasks")
 def postresult(payload: dict):
-    webserver = os.environ.get('WEBSERVER', 'localhost:8000')
-    url = f"http://{webserver}/immoviewer/api/immobilie/"
-    headers = {
-        "Content-Type": "application/json",
-    }
+    tracer = trace.get_tracer("celery-tracer")
+    with tracer.start_as_current_span("posttask-request"):
+        webserver = os.environ.get('WEBSERVER', 'localhost:8000')
+        url = f"http://{webserver}/immoviewer/api/immobilie/"
+        headers = {
+            "Content-Type": "application/json",
+        }
 
-    response = requests.request("POST", url, json=payload, headers=headers)
-    if not response.status_code in list([201, 409]):
-        handle_failed_task.delay(payload)
-        raise Exception(f"Posting task failed with status {response.status_code}: {response.text}")
-    else:
-        return f"Post successful with status: {response.status_code}"
+        response = requests.request("POST", url, json=payload, headers=headers)
+        if not response.status_code in list([201, 409]):
+            handle_failed_task.delay(payload)
+            raise Exception(f"Posting task failed with status {response.status_code}: {response.text}")
+        else:
+            meter = metrics.get_meter("celery-meter")
+            if response.status_code == 201:
+                counter = meter.create_counter("new_added_immobilien")
+                counter.add(1)
+            elif response.status_code == 409:
+                    counter = meter.create_counter("existing_immobilien")
+                    counter.add(1)
+            logger.info(f"Post successful with status: {response.status_code}")
+            return f"Post successful with status: {response.status_code}"
 
 @celery_app.task(name='handle_failed_task', queue='dead_letter')
 def handle_failed_task( payload: str):
+    meter = metrics.get_meter("celery-meter")
+    counter = meter.create_counter("failed_immobilien_post")
+    counter.add(1)
+    logger.error( f"Failed task with payload: {payload}")
     return f"Failed task with payload: {payload}"
