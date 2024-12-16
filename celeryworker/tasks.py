@@ -67,7 +67,7 @@ def zvg_scraping(state: str):
 
     selenium_service = os.environ.get('SELENIUM_SERVICE')
 
-    driver = webdriver.Remote(selenium_service, options=webdriver.ChromeOptions())
+    driver = webdriver.Remote(selenium_service, options=webdriver.FirefoxOptions())
     driver.get(url)
     select_state_element = driver.find_element(By.XPATH, "//select[@name='land_abk']")
     select_state_class = Select(select_state_element)
@@ -106,7 +106,6 @@ def zvg_scraping(state: str):
     df['Aktenzeichen'] = df['Aktenzeichen'].str.replace('(?P<aktenzeichen>\d+ K \d+\/\d+) \(Detailansicht\)', lambda m: m.groupdict()['aktenzeichen'], regex=True)
     df = df[~(df['Termin'].str.endswith("wurde aufgehoben.", na=False))]
     df[["Objekttyp", "Lage"]] = df['Objekt'].str.split(': ', expand=True)
-    df["Objekttyp"] = df["Objekttyp"].str.replace("Einfamilienhaus", "house")
     repl = lambda m: m.groupdict()['wert']
     df['Verkehrswert_zahl'] = df['Verkehrswert'].str.replace('(?P<wert>\d+\.\d+).+', repl,
                                                         regex=True)
@@ -123,7 +122,10 @@ def zvg_scraping(state: str):
         payload['price'] = row_dict['Verkehrswert_zahl']
         payload['url'] = url
         payload['location'] = row_dict['Lage']
-        payload['type'] = row_dict['Objekttyp']
+        if 'Einfamilienhaus' in row_dict['Objekttyp']:
+            payload['type'] = "house"
+        elif 'Baugrundstück' in row_dict['Objekttyp']:
+            payload['type'] = "plot"
         payload['resource'] = {
             "name": "ZVG-Portal",
             "base_url": url,
@@ -144,7 +146,7 @@ def postresult(payload: dict):
         }
 
         response = requests.request("POST", url, json=payload, headers=headers)
-        if not response.status_code in list([201, 409]):
+        if not response.status_code in list([201, 200]):
             handle_failed_task.delay(payload)
             raise Exception(f"Posting task failed with status {response.status_code}: {response.text}")
         else:
@@ -152,7 +154,7 @@ def postresult(payload: dict):
             if response.status_code == 201:
                 counter = meter.create_counter("new_added_immobilien")
                 counter.add(1)
-            elif response.status_code == 409:
+            elif response.status_code == 200:
                     counter = meter.create_counter("existing_immobilien")
                     counter.add(1)
             logger.info(f"Post successful with status: {response.status_code}")

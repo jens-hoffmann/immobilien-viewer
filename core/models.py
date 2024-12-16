@@ -39,7 +39,7 @@ class Immobilie(models.Model):
         HOUSE: "house",
     }
 
-    title = models.CharField(max_length=100, blank=False, null=False)
+    title = models.CharField(max_length=160, blank=False, null=False)
     description = models.TextField(blank=True, null=False)
 
     location = models.CharField(max_length=100, blank=False, null=False)
