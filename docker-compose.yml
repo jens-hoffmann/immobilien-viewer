@@ -33,18 +33,26 @@ services:
     environment:
       - DEBUG=1
       - APP_ENV=prod
-      - ALLOWED_HOSTS=django,localhost,127.0.0.1,0.0.0.0
-      - OTEL_SERVICE_NAME=my-otel-service
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://otel-collector:4318/v1/logs
-      - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://otel-collector:4318/v1/metrics
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
       - OTEL_LOG_LEVEL=DEBUG
     depends_on:
-      - redis
       - db
-      - otel-collector
+
+  django_celery:
+    container_name: django_celery
+    command: celery -A DjangoCelery worker -l INFO -Q djangotasks, django_dead_letter
+    build:
+      context: .
+    volumes:
+      - app:/app
+    env_file:
+      - .env
+    environment:
+      - DEBUG=1
+      - APP_ENV=prod
+      - OTEL_LOG_LEVEL=DEBUG
+    depends_on:
+      - rabbitmq
+      - django
 
   celeryworker:
     container_name: celeryworker
@@ -55,11 +63,6 @@ services:
       - .env
     environment:
       - OTEL_SERVICE_NAME=worker1
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-      - OTEL_EXPORTER_OTLP_LOGS_ENDPOINT=http://otel-collector:4318/v1/logs
-      - OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://otel-collector:4318/v1/metrics
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
       - OTEL_LOG_LEVEL=DEBUG
     volumes:
       - celery:/app
@@ -69,20 +72,40 @@ services:
       - rabbitmq
       - otel-collector
 
+  nominatim:
+    container_name: nominatim
+    image: mediagis/nominatim:4.5
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - PBF_PATH=/nominatim/data/berlin-brandenburg-241218.osm.pbf
+      - IMPORT_STYLE=address
+    shm_size: 256m
+    volumes:
+      - ./osm-maps/data:/nominatim/data
+      - nominatim-data:/var/lib/postgresql/16/main
+
   db:
-    image: postgres:16-alpine
+    image: postgis/postgis:17-3.5-alpine
     container_name: db
+    hostname: db
     volumes:
       - db-data:/var/lib/postgresql/data
     env_file:
       - .env
+    ports:
+      - "5432:5432"
 
   selenium:
     image: selenium/standalone-firefox
     container_name: selenium
     shm_size: 2gb
     environment:
-      - SE_ENABLE_TRACING=false
+      - SE_ENABLE_TRACING=true
+      - SE_OTEL_TRACES_EXPORTER=otlp
+      - SE_OTEL_EXPORTER_ENDPOINT=http://otel-collector:4317
     ports:
      - "4444:4444"
 
@@ -164,4 +187,6 @@ volumes:
         type: none
         device: ./celeryworker
   db-data:
+    driver: local
+  nominatim-data:
     driver: local

@@ -1,6 +1,8 @@
 import uuid
 
+from django.contrib.gis.db.models import PointField
 from django.db import models
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
@@ -39,10 +41,11 @@ class Immobilie(models.Model):
         HOUSE: "house",
     }
 
-    title = models.CharField(max_length=160, blank=False, null=False)
+    title = models.CharField(max_length=180, blank=False, null=False)
     description = models.TextField(blank=True, null=False)
 
     location = models.CharField(max_length=100, blank=False, null=False)
+    map_location = PointField(null=True)
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     url = models.URLField(blank=False)
     price = models.IntegerField()
@@ -56,6 +59,9 @@ class Immobilie(models.Model):
     resource = models.ForeignKey(ImmobilienResource, on_delete=models.PROTECT, null=True, blank=True)
     tags = models.ManyToManyField('Tag', blank=True)
 
+    @property
+    def lat_lng(self):
+        return list(getattr(self.map_location, 'coords', [])[::-1])
 
     def __str__(self):
         return self.title

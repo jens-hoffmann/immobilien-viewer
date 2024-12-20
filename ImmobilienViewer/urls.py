@@ -19,5 +19,6 @@ urlpatterns = [
     path('createimmobilie/', CreateImmobilieView.as_view(), name='immo-create-immobilie'),
     path('createtag/', CreateTagView.as_view(), name='immo-create-tag'),
     path('list-by-region/<uuid:uuid>/', RegionListView.as_view(), name='immo-list-by-region'),
+    path('map/', TemplateView.as_view(template_name="map.html"), name='immo-map'),
     path('api/', include(router.urls))
 ]

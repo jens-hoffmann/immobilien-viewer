@@ -1,13 +1,10 @@
 from django.db.models.query import EmptyQuerySet
 from django.views.generic import DetailView, ListView, CreateView
-from rest_framework import viewsets, status
-from rest_framework.response import Response
+from rest_framework import viewsets
 
 from ImmobilienViewer import serializers
-from ImmobilienViewer.exceptions import ImmoblilieExistsException
 from ImmobilienViewer.forms import AddRegionForm, AddImmobilieForm, AddTagForm
-from ImmobilienViewer.serializers import ImmobilienResourceSerializer
-from core.models import Immobilie, Region, Tag, ImmobilienResource
+from core.models import Immobilie, Region, Tag
 
 
 class ImmobilienDetailView(DetailView):

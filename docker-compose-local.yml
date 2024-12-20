@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: postgis/postgis:17-3.5-alpine
+    container_name: db
+    hostname: db
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  nominatim:
+    container_name: nominatim
+    image: mediagis/nominatim:4.5
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - PBF_PATH=/nominatim/data/berlin-brandenburg-241218.osm.pbf
+      - IMPORT_STYLE=address
+    shm_size: 256m
+    volumes:
+      - ./osm-maps/data:/nominatim/data
+      - nominatim-data:/var/lib/postgresql/16/main
+
+volumes:
+  nominatim-data:
+    driver: local
