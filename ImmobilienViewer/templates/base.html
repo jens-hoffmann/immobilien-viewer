@@ -5,8 +5,9 @@
   {% load django_bootstrap5 %}
   {% bootstrap_css %}
 
-  <title>{% block title %}{% endblock %}</title>
-
+  <title>{% block title %}{% endblock title %}</title>
+  {% block css %}{% endblock css %}
+  {% block javascript_head %}{% endblock javascript_head %}
 </head>
 <html>
 <body>
@@ -65,5 +66,6 @@
 
   {# Display django.contrib.messages as Bootstrap alerts #}
   {% bootstrap_messages %}
+
 </body>
 </html>

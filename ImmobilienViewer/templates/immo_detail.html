@@ -1,6 +1,23 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Immobilie{% endblock %}
+
+{% block css %}
+    <link
+      rel="stylesheet"
+      href="{% static 'map.css' %}"/>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet/dist/leaflet.css"
+      crossorigin=""/>
+{% endblock %}
+
+{% block javascript_head %}
+    <script
+      src="https://unpkg.com/leaflet/dist/leaflet.js"
+      crossorigin=""></script>
+{% endblock %}
 
 {% block content %}
 <div class="container my-5">
@@ -15,4 +32,18 @@
     </ul>
   </div>
 </div>
+{% if immobilie.lat_lng|length > 0 %}
+    <div class="container-lg my-5 bg-body-tertiary rounded-3" id="map">
+            <script>
+                var mapLatitudeLongitude = {{immobilie.lat_lng}};
+                var mapAdress = "{{immobilie.location}}";
+            </script>
+            <script defer src="{% static 'map.js' %}"></script>
+    </div>
+
+{% endif %}
+
+
 {% endblock %}
+
+

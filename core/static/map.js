@@ -1,6 +1,8 @@
-const osm = "https://www.openstreetmap.org/copyright";
-const copy = `© <a href='${osm}'>OpenStreetMap</a>`;
-const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const layer = L.tileLayer(url, { attribution: copy });
-const map = L.map("map", { layers: [layer] });
-map.fitWorld();
+const map = L.map('map').setView(mapLatitudeLongitude, 13);
+const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+const marker = L.marker(mapLatitudeLongitude).addTo(map)
+		.bindPopup(mapAdress).openPopup();

@@ -61,7 +61,7 @@ class Immobilie(models.Model):
 
     @property
     def lat_lng(self):
-        return list(getattr(self.map_location, 'coords', [])[::-1])
+        return list(reversed(getattr(self.map_location, 'coords', [])[::-1]))
 
     def __str__(self):
         return self.title
