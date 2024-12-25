@@ -30,6 +30,7 @@
         <li><small class="text-muted">Provider: {{immobilie.provider}}</small></li>
         <li><small class="text-muted">Location: {{immobilie.location}}</small></li>
     </ul>
+    <a class="btn btn-primary" href="{% url 'immoviewer:immo-update-immobilie' immobilie.uuid %}" role="button">Edit</a>
   </div>
 </div>
 {% if immobilie.lat_lng|length > 0 %}
