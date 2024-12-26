@@ -39,7 +39,7 @@ services:
 
   django_celery:
     container_name: django_celery
-    command: celery -A DjangoCelery worker -l INFO -Q djangotasks, django_dead_letter
+    command: celery -A DjangoCelery worker -l INFO -Q djangotasks,django_dead_letter
     build:
       context: .
     volumes:
@@ -53,6 +53,7 @@ services:
     depends_on:
       - rabbitmq
       - django
+      - nominatim
 
   celeryworker:
     container_name: celeryworker

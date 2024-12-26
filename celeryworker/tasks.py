@@ -135,7 +135,7 @@ def zvg_scraping(state: str):
 
     return f"zvg_scraping for {state} successful."
 
-@celery_app.task(name='postresult', queue="posttasks")
+@celery_app.task(name='postresult', queue="posttasks", rate_limit='60/m')
 def postresult(payload: dict):
     tracer = trace.get_tracer("celery-tracer")
     with tracer.start_as_current_span("posttask-request"):
