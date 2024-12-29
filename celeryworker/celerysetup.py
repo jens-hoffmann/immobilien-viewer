@@ -3,6 +3,7 @@ import os
 
 from celery import Celery
 from celery.signals import worker_process_init
+from dotenv import load_dotenv
 from kombu import Exchange, Queue
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 from opentelemetry.instrumentation.celery import CeleryInstrumentor
@@ -28,9 +29,17 @@ from opentelemetry._logs import set_logger_provider
 
 @worker_process_init.connect(weak=False)
 def init_celery_tracing(*args, **kwargs):
-    CeleryInstrumentor().instrument()
+    load_dotenv()
+
+    app_environment = os.environ.get("APP_ENV", "local")
+
+    """Run administrative tasks."""
+    if app_environment == "local":
+        return
+
     LoggingInstrumentor().instrument()
     RequestsInstrumentor().instrument()
+    CeleryInstrumentor().instrument()
 
     traces_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", None)
     metrics_endpoint = os.environ.get("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", None)

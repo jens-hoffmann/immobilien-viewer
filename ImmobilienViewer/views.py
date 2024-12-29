@@ -1,11 +1,12 @@
 from django.db.models.query import EmptyQuerySet
+from django.urls import reverse
 from django.views.generic import DetailView, ListView, CreateView, UpdateView
 from rest_framework import viewsets
 
 from django.contrib import messages
 from ImmobilienViewer import serializers
-from ImmobilienViewer.forms import AddRegionForm, ImmobilieForm, AddTagForm
-from core.models import Immobilie, Region, Tag
+from ImmobilienViewer.forms import AddRegionForm, ImmobilieForm, AddTagForm, AttachmentForm
+from core.models import Immobilie, Region, Tag, FileAttachment
 
 
 class ImmobilienDetailView(DetailView):
@@ -15,7 +16,14 @@ class ImmobilienDetailView(DetailView):
     context_object_name = 'immobilie'
 
     def get_object(self, *args, **kwargs):
-        return Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        immo = Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        return immo
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        immo = Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        context['attachments'] = immo.attachments.all()
+        return context
 
 class ImmobilienListView(ListView):
 
@@ -63,8 +71,12 @@ class UpdateImmobilieView(UpdateView):
     model = Immobilie
     form_class = ImmobilieForm
     template_name = 'immobilie_form.html'
-    success_url = '/immoviewer/list/'
     extra_context = {'title': 'Update existing Immobilie', 'active': 'edit'}
+
+    def get_success_url(self):
+        url = reverse('immoviewer:immo-detail', kwargs={'uuid': self.kwargs['uuid']})
+        return url
+
 
     def get_object(self, *args, **kwargs):
         return Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
@@ -86,3 +98,18 @@ class ImmobilienAPIView(viewsets.ModelViewSet):
     serializer_class = serializers.ImmobilienSerializer
     queryset = Immobilie.objects.all()
 
+
+class UploadAttachmentView(CreateView):
+
+    model = FileAttachment
+    form_class = AttachmentForm
+    template_name = 'upload_form.html'
+
+    def get_success_url(self):
+        url = reverse('immoviewer:immo-detail', kwargs={'uuid': self.kwargs['uuid']})
+        return url
+
+    def form_valid(self, form):
+        immobilie = Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        form.instance.immobilie = immobilie
+        return super().form_valid(form)

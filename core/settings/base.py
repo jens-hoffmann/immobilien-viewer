@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
-from django.conf.global_settings import STATICFILES_DIRS
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_standardized_errors',
     'django_bootstrap5',
+    'crispy_forms',
+    'crispy_bootstrap5',
     # Internal Apps
     'core',
     'ImmobilienViewer',
@@ -122,9 +123,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -138,3 +139,7 @@ REST_FRAMEWORK = {
     # other settings
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler"
 }
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"

@@ -53,6 +53,7 @@ class Immobilie(models.Model):
     provider_id = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted = models.BooleanField(default=False)
     type = models.CharField(max_length=10, choices=IMMOBIEN_TYPES)
 
     region = models.ForeignKey(Region, on_delete=models.PROTECT, null=True, blank=True)
@@ -65,3 +66,13 @@ class Immobilie(models.Model):
 
     def __str__(self):
         return self.title
+
+class FileAttachment(models.Model):
+
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100, blank=False, null=False)
+    attachment = models.FileField(upload_to='attachments/')
+    immobilie = models.ForeignKey(Immobilie, on_delete=models.PROTECT, null=False, blank=False, related_name='attachments')
+
+    def __str__(self):
+        return self.name

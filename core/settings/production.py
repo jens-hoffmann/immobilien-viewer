@@ -45,3 +45,7 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
+
+STATICFILES_DIRS = [BASE_DIR / "static"]  # Todo change static files handling
+
+MEDIA_ROOT = BASE_DIR / 'media'

@@ -1,3 +1,5 @@
+from core.settings.base import MEDIA_URLfrom core.settings.base import BASE_DIRfrom django.conf.global_settings import MEDIA_ROOT
+
 # Services
 
 Django: http://localhost:8000
@@ -88,7 +90,7 @@ Start tasks
 
 >celery call app.tasks.update_something
  
-# OpenTelemetry
+## OpenTelemetry
 
 * https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/django/django.html
 * https://github.com/open-telemetry/opentelemetry-python/tree/main/docs/examples/django
@@ -96,7 +98,7 @@ Start tasks
 * https://github.com/open-telemetry/opentelemetry-python/tree/main/docs/examples
 
 
-## Install dependencies
+### Install dependencies
 
 ```
 pip install opentelemetry-sdk
@@ -114,10 +116,36 @@ from opentelemetry.instrumentation.django import DjangoInstrumentor
 DjangoInstrumentor().instrument(is_sql_commentor_enabled=True)
 ```
 
-## Configure SDK
+### Configure SDK
 
 https://opentelemetry.io/docs/languages/sdk-configuration/
 
 Set environment in docker-compose
 
 >opentelemetry-bootstrap --action=install
+
+# GeoDjango, PostGIS and Leaflet
+
+https://www.paulox.net/2021/07/19/maps-with-django-part-2-geodjango-postgis-and-leaflet/
+
+## PostGIS: Postgres with GIS extensions
+
+https://www.paulox.net/2021/07/19/maps-with-django-part-2-geodjango-postgis-and-leaflet/
+
+https://www.youtube.com/watch?v=aEivCtavw-I
+
+
+# Signals
+
+
+
+# File Upload
+
+https://docs.djangoproject.com/en/5.1/topics/files/
+
+settings.py
+```python
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+
+```

@@ -1,6 +1,6 @@
 from django import forms
 
-from core.models import Region, Immobilie, Tag
+from core.models import Region, Immobilie, Tag, FileAttachment
 
 
 class AddRegionForm(forms.ModelForm):
@@ -17,7 +17,6 @@ class ImmobilieForm(forms.ModelForm):
 
     class Meta:
         model = Immobilie
-        # fields = ('title', 'description', 'price', 'url', 'location', 'region')
         fields = ('title', 'description', 'provider','provider_id', 'price', 'url', 'location')
 
         widgets = {
@@ -28,7 +27,6 @@ class ImmobilieForm(forms.ModelForm):
             'provider_id': forms.TextInput(attrs={'class': 'form-control'}),
             'price': forms.NumberInput(attrs={'class': 'form-control'}),
             'url': forms.URLInput(attrs={'class': 'form-control'}),
-            # 'region': forms.Select(attrs={'class': 'form-control'}),
         }
 
 class AddTagForm(forms.ModelForm):
@@ -40,3 +38,10 @@ class AddTagForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class AttachmentForm(forms.ModelForm):
+
+    class Meta:
+        model = FileAttachment
+        fields = ('name', 'attachment')
+

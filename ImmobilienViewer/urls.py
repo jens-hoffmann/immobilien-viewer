@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 
 from .views import ImmobilienDetailView, ImmobilienListView, RegionListView, CreateRegionView, CreateImmobilieView, \
-    CreateTagView, ImmobilienAPIView, UpdateImmobilieView
+    CreateTagView, ImmobilienAPIView, UpdateImmobilieView, UploadAttachmentView
 
 router = DefaultRouter()
 router.register('immobilie', ImmobilienAPIView)
@@ -17,6 +17,7 @@ urlpatterns = [
     path('createregion/', CreateRegionView.as_view(), name='immo-create-region'),
     path('createimmobilie/', CreateImmobilieView.as_view(), name='immo-create-immobilie'),
     path('updateimmobilie/<uuid:uuid>/', UpdateImmobilieView.as_view(), name='immo-update-immobilie'),
+    path('updateimmobilie/<uuid:uuid>/uploadattachment', UploadAttachmentView.as_view(), name='immo-upload-attachment'),
     path('createtag/', CreateTagView.as_view(), name='immo-create-tag'),
     path('list-by-region/<uuid:uuid>/', RegionListView.as_view(), name='immo-list-by-region'),
     path('map/', TemplateView.as_view(template_name="map.html"), name='immo-map'),

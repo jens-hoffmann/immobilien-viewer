@@ -7,7 +7,7 @@ broker_url = os.environ.get('CELERY_BROKER_URL')
 broker_connection_retry_on_startup = True
 include = ('tasks',)
 broker_connection_timeout = 60
-result_backend = 'redis://redis:6379/0'
+result_backend = os.environ.get('CELERY_BACKEND')
 
 task_routes = {
     'zvg_scraping': {'queue': 'scrapingtasks'},
