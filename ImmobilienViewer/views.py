@@ -1,6 +1,6 @@
 from django.db.models.query import EmptyQuerySet
 from django.urls import reverse
-from django.views.generic import DetailView, ListView, CreateView, UpdateView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 from rest_framework import viewsets
 
 from django.contrib import messages
@@ -77,7 +77,6 @@ class UpdateImmobilieView(UpdateView):
         url = reverse('immoviewer:immo-detail', kwargs={'uuid': self.kwargs['uuid']})
         return url
 
-
     def get_object(self, *args, **kwargs):
         return Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
 
@@ -106,10 +105,56 @@ class UploadAttachmentView(CreateView):
     template_name = 'upload_form.html'
 
     def get_success_url(self):
-        url = reverse('immoviewer:immo-detail', kwargs={'uuid': self.kwargs['uuid']})
+        # url = reverse('immoviewer:immo-detail', kwargs={'uuid': self.kwargs['uuid']})
+        url = reverse('immoviewer:immo-list-attachments', kwargs={'uuid': self.kwargs['uuid']})
         return url
 
     def form_valid(self, form):
         immobilie = Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
         form.instance.immobilie = immobilie
         return super().form_valid(form)
+
+class AttachmentListView(ListView):
+
+    model = FileAttachment
+    template_name = 'attachment_list.html'
+    context_object_name = 'attachments'
+
+    def get_queryset(self):
+        attachments =  FileAttachment.objects.filter(immobilie__uuid=self.kwargs.get('uuid'))
+        return attachments
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        immobilie =  Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        context['immobilie'] = immobilie
+        return context
+
+class DeleteAttachmentView(DeleteView):
+
+    model = FileAttachment
+    template_name = 'attachment_confirm_delete.html'
+    context_object_name = 'attachment'
+
+    def get_queryset(self):
+        attachments = FileAttachment.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        return attachments
+
+    def form_valid(self, form):
+        messages.success(self.request, "The attachment was deleted successfully.")
+        return super(DeleteAttachmentView,self).form_valid(form)
+
+    def get_object(self, *args, **kwargs):
+        attachments = FileAttachment.objects.filter(uuid=self.kwargs.get('uuid'))
+        return attachments
+
+    def get_success_url(self):
+        attachment = FileAttachment.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        url = reverse('immoviewer:immo-list-attachments', kwargs={'uuid': attachment.immobilie.uuid})
+        return url
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        attachment = FileAttachment.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        context['immobilie'] = attachment.immobilie
+        return context

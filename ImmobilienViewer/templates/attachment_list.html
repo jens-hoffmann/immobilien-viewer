@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Attachment list{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4">Attachments for {{attachments.0.immobilie.title}}</h1>
+            <p class="lead">List of attachments</p>
+        </div>
+         <a class="btn btn-secondary" href="{% url 'immoviewer:immo-upload-attachment' immobilie.uuid %}" role="button">Upload attachments</a>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">File</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+             {% for attachment in attachments %}
+                <tr>
+                  <td>{{attachment.name}}</td>
+                  <td>{{attachment.attachment.url}}</td>
+                  <td><a class="btn btn-danger" href="{% url 'immoviewer:immo-delete-attachment' attachment.uuid %}" role="button">Delete</a></td>
+                </tr>
+             {% endfor %}
+          </tbody>
+        </table>
+    </div>
+
+{% endblock %}

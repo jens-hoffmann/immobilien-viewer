@@ -22,7 +22,11 @@
 {% block content %}
 <div class="container my-5">
     <a class="btn btn-primary" href="{% url 'immoviewer:immo-update-immobilie' immobilie.uuid %}" role="button">Edit</a>
-    <a class="btn btn-primary" href="{% url 'immoviewer:immo-upload-attachment' immobilie.uuid %}" role="button">Upload attachments</a>
+    <a class="btn btn-secondary" href="{% url 'immoviewer:immo-upload-attachment' immobilie.uuid %}" role="button">Upload attachments</a>
+    {% if attachments|length > 0 %}
+    <a class="btn btn-secondary" href="{% url 'immoviewer:immo-list-attachments' immobilie.uuid %}" role="button">List attachments</a>
+    {% endif %}
+
   <div class="p-5 text-left bg-body-tertiary rounded-3">
     <h1 class="text-body-emphasis text-center">{{immobilie.title}}</h1>
     <p class="col-lg-8 mx-auto fs-5 text-muted">{{immobilie.description}}</p>
