@@ -54,17 +54,20 @@ class CreateRegionView(CreateView):
     model = Region
     form_class = AddRegionForm
     template_name = 'immobilie_form.html'
-    success_url = '/immoviewer/list/'
     extra_context = {'title': 'Create a new region', 'active': 'create'}
 
+    def get_success_url(self):
+        return reverse('immoviewer:immo-list')
 
 class CreateImmobilieView(CreateView):
 
     model = Immobilie
     form_class = ImmobilieForm
     template_name = 'immobilie_form.html'
-    success_url = '/immoviewer/list/'
     extra_context = {'title': 'Create a new Immobilie', 'active': 'create'}
+
+    def get_success_url(self):
+        return reverse('immoviewer:immo-list')
 
 class UpdateImmobilieView(UpdateView):
 
@@ -105,7 +108,6 @@ class UploadAttachmentView(CreateView):
     template_name = 'upload_form.html'
 
     def get_success_url(self):
-        # url = reverse('immoviewer:immo-detail', kwargs={'uuid': self.kwargs['uuid']})
         url = reverse('immoviewer:immo-list-attachments', kwargs={'uuid': self.kwargs['uuid']})
         return url
 
