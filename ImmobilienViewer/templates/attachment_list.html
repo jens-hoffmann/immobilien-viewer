@@ -9,6 +9,7 @@
             <h1 class="display-4">Attachments for {{attachments.0.immobilie.title}}</h1>
             <p class="lead">List of attachments</p>
         </div>
+         <a class="btn btn-secondary" href="{% url 'immoviewer:immo-detail' immobilie.uuid %}" role="button">Back to immobilie</a>
          <a class="btn btn-secondary" href="{% url 'immoviewer:immo-upload-attachment' immobilie.uuid %}" role="button">Upload attachments</a>
         <table class="table">
           <thead>
