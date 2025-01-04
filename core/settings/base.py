@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'crispy_forms',
     'crispy_bootstrap5',
+    'haystack',
     # Internal Apps
     'core',
     'ImmobilienViewer',
@@ -132,8 +133,8 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND")
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "amqp://rabbit:eatthemessage@localhost:5672/")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", )
 
 REST_FRAMEWORK = {
     # other settings

@@ -134,6 +134,10 @@ https://www.paulox.net/2021/07/19/maps-with-django-part-2-geodjango-postgis-and-
 
 https://www.youtube.com/watch?v=aEivCtavw-I
 
+## Nominatim 
+
+>osmium merge file1.osm file2.osm -o merged.osm
+> 
 
 # Signals
 
@@ -149,3 +153,37 @@ MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 ```
+
+
+# Search 
+
+https://haystacksearch.org/
+
+## Installing Solr
+
+https://solr.apache.org/guide/solr/latest/deployment-guide/solr-in-docker.html
+
+```dockerfile
+  solr:
+    container_name: solr
+    image: solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr-data:/var/solr
+    command:
+      - solr-precreate
+      - haystackcore
+```
+
+## Setup Haystack
+
+https://django-haystack.readthedocs.io/en/master/tutorial.html#installation
+
+https://www.egrovesys.com/blog/solr-implementation-using-django-haystack/
+
+https://coffeebytes.dev/en/searches-with-solr-with-django-haystack/
+
+>python3 manage.py build_solr_schema > conf/solr/managed_schema
+
+

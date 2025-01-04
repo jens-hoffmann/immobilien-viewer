@@ -34,8 +34,10 @@ services:
       - DEBUG=1
       - APP_ENV=prod
       - OTEL_LOG_LEVEL=DEBUG
+      - SOLR_URL=http://solr:8983
     depends_on:
       - db
+      - solr
 
   django_celery:
     container_name: django_celery
@@ -174,6 +176,16 @@ services:
     ports:
       - "3100:3100"
 
+  solr:
+    container_name: solr
+    build:
+      context: ./solr
+    command: [ "solr-precreate", "haystackcore", "/haystackcore_conf"]
+    ports:
+      - "8983:8983"
+    volumes:
+      - solr-data:/var/solr
+
 volumes:
   app:
     driver: local
@@ -190,4 +202,6 @@ volumes:
   db-data:
     driver: local
   nominatim-data:
+    driver: local
+  solr-data:
     driver: local

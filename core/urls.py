@@ -23,7 +23,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('',  RedirectView.as_view(pattern_name='immoviewer:homepage', permanent=False)),
     path('admin/', admin.site.urls),
-    path('immoviewer/', include('ImmobilienViewer.urls', namespace='immoviewer'))
+    path('immoviewer/', include('ImmobilienViewer.urls', namespace='immoviewer')),
+    path('search/', include('haystack.urls')),
 ]
 
 if settings.DEBUG:

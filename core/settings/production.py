@@ -49,3 +49,13 @@ LOGGING = {
 STATICFILES_DIRS = [BASE_DIR / "static"]  # Todo change static files handling
 
 MEDIA_ROOT = BASE_DIR / 'media'
+solr_url = os.environ.get('SOLR_URL', 'http://localhost:8983')
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': f'{solr_url}/solr/haystackcore',
+        'ADMIN_URL': f'{solr_url}/solr/admin/cores'
+    },
+}
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
