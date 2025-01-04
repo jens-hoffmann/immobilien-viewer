@@ -65,7 +65,7 @@ def get_elements_from_table(driver, table):
 def zvg_scraping(state: str):
     url = 'https://www.zvg-portal.de/index.php?button=Termine%20suchen'
 
-    selenium_service = os.environ.get('SELENIUM_SERVICE')
+    selenium_service = os.environ.get('SELENIUM_SERVICE', 'http://localhost:4444')
 
     driver = webdriver.Remote(selenium_service, options=webdriver.FirefoxOptions())
     driver.get(url)

@@ -41,6 +41,17 @@ services:
     ports:
       - "5432:5432"
 
+  selenium:
+    image: selenium/standalone-firefox
+    container_name: selenium
+    shm_size: 2gb
+    environment:
+      - SE_ENABLE_TRACING=true
+      - SE_OTEL_TRACES_EXPORTER=otlp
+      - SE_OTEL_EXPORTER_ENDPOINT=http://otel-collector:4317
+    ports:
+     - "4444:4444"
+
   nominatim:
     container_name: nominatim
     image: mediagis/nominatim:4.5
@@ -55,6 +66,18 @@ services:
     volumes:
       - ./osm-maps/data:/nominatim/data
       - nominatim-data:/var/lib/postgresql/16/main
+
+  prometheus:
+      image: prom/prometheus
+      container_name: 'prometheus'
+      command:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+      volumes:
+        - ./config/prometheus/:/etc/prometheus/
+      ports:
+        - 9090:9090
+      depends_on:
+        - otel-collector
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib
@@ -71,6 +94,43 @@ services:
       - "4318:4318" # OTLP http receiver
       - "55679:55679" # zpages extension
 
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+        - './config/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml'
+    depends_on:
+      - prometheus
+      - loki
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - 16686:16686
+      - 6831:6831
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    depends_on:
+      - otel-collector
+
+  loki:
+    image: grafana/loki:latest
+    command:
+      - "-config.file=/etc/loki/local-config.yaml"
+    volumes:
+      - './config/loki/local-config.yaml:/etc/loki/local-config.yaml'
+      - ./shared/loki/chunks:/loki/chunks/
+      - ./shared/loki/rules:/loki/rules/
+    ports:
+      - "3100:3100"
+
   solr:
     container_name: solr
     build:
@@ -80,7 +140,6 @@ services:
       - "8983:8983"
     volumes:
       - solr-data:/var/solr
-
 
 volumes:
   nominatim-data:

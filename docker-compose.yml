@@ -67,6 +67,7 @@ services:
     environment:
       - OTEL_SERVICE_NAME=worker1
       - OTEL_LOG_LEVEL=DEBUG
+      - SELENIUM_SERVICE=http://selenium:4444
     volumes:
       - celery:/app
     depends_on:
