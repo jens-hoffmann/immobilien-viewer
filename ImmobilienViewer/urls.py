@@ -21,6 +21,7 @@ urlpatterns = [
     path('immobilie/attachment/delete/<uuid:uuid>/', DeleteAttachmentView.as_view(), name='immo-delete-attachment'),
     path('tag/create/', CreateTagView.as_view(), name='immo-create-tag'),
     path('list-by-region/<uuid:uuid>/', RegionListView.as_view(), name='immo-list-by-region'),
-    path('map/', TemplateView.as_view(template_name="map.html"), name='immo-map'),
-    path('api/', include(router.urls))
+    path('map/', MapView.as_view(), name='immo-map'),
+    path('api/', include(router.urls)),
+    path('api/geojson/list/', GeoJSONAPIView.as_view(), name='api-geojson-list')
 ]

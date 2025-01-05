@@ -138,7 +138,8 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", )
 
 REST_FRAMEWORK = {
     # other settings
-    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler"
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
+
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

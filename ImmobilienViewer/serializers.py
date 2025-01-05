@@ -1,4 +1,8 @@
 from rest_framework import serializers
+from rest_framework_gis.fields import GeometrySerializerMethodField
+from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeoModelSerializer
+from django.contrib.gis.geos import Point
+
 
 from ImmobilienViewer.exceptions import ImmoblilieExistsException
 from core.models import Immobilie, Region, ImmobilienResource
@@ -33,3 +37,18 @@ class ImmobilienSerializer(serializers.ModelSerializer):
 
             immo_obj = Immobilie.objects.create(resource=resource_object, **validated_data)
             return immo_obj
+
+
+class ImmobilieLocationSerializer(GeoFeatureModelSerializer):
+
+    map_location = GeometrySerializerMethodField()
+
+    def get_map_location(self, obj):
+        return Point(obj.map_location.x, obj.map_location.y)
+
+    class Meta:
+        model = Immobilie
+        geo_field = "map_location"
+
+        fields = ('uuid', 'title', 'location')
+

@@ -27,6 +27,9 @@
             <li class="nav-item">
               <a class="nav-link {% if active == 'list' %}active{% endif %}" href="{% url 'immoviewer:immo-list' %}">List</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link {% if active == 'map' %}active{% endif %}" href="{% url 'immoviewer:immo-map' %}">Map</a>
+            </li>
             <li class="nav-item dropdown">
               <a class="nav-link {% if active == 'list-by-region' %}active{% endif %} dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 List by region
@@ -55,7 +58,7 @@
             <input class="form-control me-2" id="searchinput" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
-        </div>
+        </ul>
       </div>
     </nav>
 

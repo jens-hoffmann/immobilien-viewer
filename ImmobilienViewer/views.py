@@ -1,12 +1,14 @@
+from django.core.serializers import serialize
 from django.db.models.query import EmptyQuerySet
 from django.urls import reverse
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView
 from haystack.forms import SearchForm
 from haystack.generic_views import SearchView
-from haystack.query import SearchQuerySet
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 
 from django.contrib import messages
+from rest_framework.generics import ListAPIView
+
 from ImmobilienViewer import serializers
 from ImmobilienViewer.forms import AddRegionForm, ImmobilieForm, AddTagForm, AttachmentForm
 from core.models import Immobilie, Region, Tag, FileAttachment
@@ -98,11 +100,6 @@ class CreateTagView(CreateView):
     success_url = '/immoviewer/list/'
     extra_context = {'title': 'Create a new tag', 'active': 'create'}
 
-class ImmobilienAPIView(viewsets.ModelViewSet):
-
-    serializer_class = serializers.ImmobilienSerializer
-    queryset = Immobilie.objects.all()
-
 
 class UploadAttachmentView(CreateView):
 
@@ -173,8 +170,29 @@ class ImmoSearchView(SearchView):
         queryset = super().get_queryset()
         return queryset
 
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        # do something
         return context
+
+
+class MapView(TemplateView):
+
+    template_name = 'map.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        geojson = serialize("geojson", Immobilie.objects.filter(map_location__isnull=False), geometry_field="map_location", fields=["title", "location"])
+
+        return context
+
+
+class ImmobilienAPIView(viewsets.ModelViewSet):
+
+    serializer_class = serializers.ImmobilienSerializer
+    queryset = Immobilie.objects.all()
+
+
+class GeoJSONAPIView(ListAPIView):
+
+    queryset = Immobilie.objects.filter(map_location__isnull=False)
+    serializer_class = serializers.ImmobilieLocationSerializer

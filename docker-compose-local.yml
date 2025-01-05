@@ -16,6 +16,23 @@ services:
     ports:
       - "6379:6379"
 
+  django_celery:
+    container_name: django_celery
+    command: celery -A DjangoCelery worker -l INFO -Q djangotasks,django_dead_letter
+    build:
+      context: .
+    volumes:
+      - app:/app
+    env_file:
+      - .env
+    environment:
+      - DEBUG=1
+      - OTEL_LOG_LEVEL=DEBUG
+    depends_on:
+      - rabbitmq
+      - nominatim
+      - db
+
   db:
     image: postgis/postgis:17-3.5-alpine
     container_name: db
@@ -115,6 +132,12 @@ services:
       - solr-data:/var/solr
 
 volumes:
+  app:
+    driver: local
+    driver_opts:
+        o: bind
+        type: none
+        device: .
   nominatim-data:
     driver: local
   solr-data:

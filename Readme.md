@@ -137,7 +137,10 @@ https://www.youtube.com/watch?v=aEivCtavw-I
 ## Nominatim 
 
 >osmium merge file1.osm file2.osm -o merged.osm
-> 
+
+https://github.com/openwisp/django-rest-framework-gis 
+
+
 
 # Signals
 

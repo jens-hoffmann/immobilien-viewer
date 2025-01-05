@@ -14,7 +14,7 @@ from core.models import Immobilie
 @shared_task(name='update_map_locations', queue='djangotasks', rate_limit='60/m')
 def update_map_locations(immobilie_uuid):
 
-    url = os.environ.get('NOMINATIM_URL', None)
+    url = os.environ.get('NOMINATIM_URL', 'http://nominatim:8080/search')
     if url is None:
         raise ConnectionError(f"Invalid nominatim url {url}")
 
