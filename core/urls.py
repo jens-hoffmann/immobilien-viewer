@@ -20,11 +20,13 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from ImmobilienViewer.views import ImmoSearchView
+
 urlpatterns = [
     path('',  RedirectView.as_view(pattern_name='immoviewer:homepage', permanent=False)),
     path('admin/', admin.site.urls),
     path('immoviewer/', include('ImmobilienViewer.urls', namespace='immoviewer')),
-    path('search/', include('haystack.urls')),
+    path('search/', ImmoSearchView.as_view(), name='haystack-search'),
 ]
 
 if settings.DEBUG:

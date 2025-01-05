@@ -16,22 +16,6 @@ services:
     ports:
       - "6379:6379"
 
-  celeryworker:
-    container_name: celeryworker
-    build:
-      context: ./celeryworker
-    command: celery -A celerysetup worker -l INFO -Q celery,posttasks,scrapingtasks,dead_letter -B
-    env_file:
-      - .env
-    environment:
-      - OTEL_SERVICE_NAME=worker1
-      - OTEL_LOG_LEVEL=DEBUG
-    volumes:
-      - celery:/app
-    depends_on:
-      - redis
-      - rabbitmq
-
   db:
     image: postgis/postgis:17-3.5-alpine
     container_name: db
@@ -40,17 +24,6 @@ services:
       - .env
     ports:
       - "5432:5432"
-
-  selenium:
-    image: selenium/standalone-firefox
-    container_name: selenium
-    shm_size: 2gb
-    environment:
-      - SE_ENABLE_TRACING=true
-      - SE_OTEL_TRACES_EXPORTER=otlp
-      - SE_OTEL_EXPORTER_ENDPOINT=http://otel-collector:4317
-    ports:
-     - "4444:4444"
 
   nominatim:
     container_name: nominatim

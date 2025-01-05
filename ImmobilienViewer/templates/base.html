@@ -38,7 +38,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link {% if active == 'create' %}active{% endif %} dropdown-toggle" href="#" ole="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link {% if active == 'create' %}active{% endif %} dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Create
               </a>
                 <ul class="dropdown-menu">
@@ -51,8 +51,8 @@
               <a class="nav-link disabled" aria-disabled="true">Disabled</a>
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <form class="d-flex" role="search" id="searchform">
+            <input class="form-control me-2" id="searchinput" type="search" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
         </div>
@@ -66,6 +66,17 @@
 
   {# Display django.contrib.messages as Bootstrap alerts #}
   {% bootstrap_messages %}
+  <script>
+       document.getElementById('searchform').addEventListener('submit', function(event) {
+          event.preventDefault();
 
+          let baseUrl = '{% url 'haystack-search' %}';
+          let query = document.getElementById('searchinput').value;
+          if (query) {
+              let fullUrl = `${baseUrl}?q=${encodeURIComponent(query)}`;
+              window.location.href = fullUrl;
+          }
+       });
+  </script>
 </body>
 </html>

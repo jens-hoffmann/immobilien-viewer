@@ -1,6 +1,9 @@
 from django.db.models.query import EmptyQuerySet
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
+from haystack.forms import SearchForm
+from haystack.generic_views import SearchView
+from haystack.query import SearchQuerySet
 from rest_framework import viewsets
 
 from django.contrib import messages
@@ -159,4 +162,19 @@ class DeleteAttachmentView(DeleteView):
         context = super().get_context_data(**kwargs)
         attachment = FileAttachment.objects.filter(uuid=self.kwargs.get('uuid'))[0]
         context['immobilie'] = attachment.immobilie
+        return context
+
+class ImmoSearchView(SearchView):
+
+    template_name = 'search.html'
+    form_class = SearchForm
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
+
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        # do something
         return context
