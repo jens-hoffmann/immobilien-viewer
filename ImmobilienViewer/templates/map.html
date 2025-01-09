@@ -10,19 +10,42 @@
      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
          crossorigin=""/>
-{% endblock %}
+    <style>
+		#overlay h2, #slide-in h2 {
+			margin: 0;
+			padding: 0;
+			margin-bottom: 10px;
+		}
+		#slide-in {
+			padding: 10px;
+			position: absolute;
+			width: 250px;
+			z-index: 1000;
+			background: white;
+			margin-left: -270px;
+			transition: 0.5s;
+		}
+		#slide-in.in {
+			margin-left: 0px;
+		}
+    </style>
 
-{% block javascript_head %}
-     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-         crossorigin=""></script>
 {% endblock %}
 
 {% block content %}
 
-    <h1>Map</h1>
-    <div class="container-lg my-5 bg-body-tertiary rounded-3" id="map">
-         <script defer src="{% static 'map_geojson.js' %}"></script>
+
+    <div id="map">
+        <div class="leaflet-control" id="slide-in">
+            <div id="immo-information"></div>
+            <a href="#" id="immo-detail-link">Detail page</a>
+            <button id="btn-slide-out">Close</button>
+	    </div>
     </div>
 
 {% endblock %}
+
+
+{% block js %}
+	<script defer src="{% static 'map_geojson.js' %}"></script>
+{% endblock js %}
