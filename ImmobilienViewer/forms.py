@@ -1,13 +1,20 @@
 from django import forms
 
-from core.models import Region, Immobilie, Tag, FileAttachment
+from core.models import Region, Immobilie, Tag, FileAttachment, District
 
 
 class AddRegionForm(forms.ModelForm):
 
     class Meta:
         model = Region
-        fields = ('name',)
+        exclude = ['uuid', 'tags']
+
+    name = forms.CharField(widget=forms.TextInput())
+    districts = forms.ModelMultipleChoiceField(
+        widget=forms.SelectMultiple(attrs={'id': 'district-selection'}),
+        queryset=District.objects.all()
+        )
+
 
 class ImmobilieForm(forms.ModelForm):
 

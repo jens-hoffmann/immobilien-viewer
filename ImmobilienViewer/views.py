@@ -58,7 +58,7 @@ class CreateRegionView(CreateView):
 
     model = Region
     form_class = AddRegionForm
-    template_name = 'immobilie_form.html'
+    template_name = 'region_form.html'
     extra_context = {'title': 'Create a new region', 'active': 'create'}
 
     def get_success_url(self):

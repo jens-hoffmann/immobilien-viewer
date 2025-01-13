@@ -28,6 +28,7 @@ services:
     environment:
       - DEBUG=1
       - OTEL_LOG_LEVEL=DEBUG
+      - WEBSERVER=localhost:8000
     depends_on:
       - rabbitmq
       - nominatim
