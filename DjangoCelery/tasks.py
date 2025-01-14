@@ -75,8 +75,10 @@ def update_all_regions():
                         search_list.append(adress_dict["town"])
                     if "municipality" in adress_dict:
                         search_list.append(adress_dict["municipality"])
-                    if "town" in adress_dict:
-                        search_list.append(adress_dict["town"])
+                    if "county" in adress_dict:
+                        search_list.append(adress_dict["county"])
+                    if "city" in adress_dict:
+                        search_list.append(adress_dict["city"])
 
                     found_regions = region.districts.filter(name__in=search_list)
                     if len(found_regions) > 0:
@@ -93,7 +95,7 @@ def update_all_regions():
                 f"Nominatim response {response.status_code}  Reverse query failed for map location {immobilie.lat_lng}")
 
 @shared_task(name='update_immobilie_regions', queue='djangotasks', rate_limit='60/m')
-def update_immobilie_regions(immobilie_uuid):
+def update_immobilie_regions(predecessor_task_result, immobilie_uuid):
     url = os.environ.get('NOMINATIM_URL', 'http://nominatim:8080') + "/reverse"
     if url is None:
         raise ConnectionError(f"Invalid nominatim url {url}")
@@ -119,8 +121,10 @@ def update_immobilie_regions(immobilie_uuid):
                         search_list.append(adress_dict["town"])
                     if "municipality" in adress_dict:
                         search_list.append(adress_dict["municipality"])
-                    if "town" in adress_dict:
-                        search_list.append(adress_dict["town"])
+                    if "county" in adress_dict:
+                        search_list.append(adress_dict["county"])
+                    if "city" in adress_dict:
+                        search_list.append(adress_dict["city"])
 
                     found_regions = region.districts.filter(name__in=search_list)
                     if len(found_regions) > 0:
