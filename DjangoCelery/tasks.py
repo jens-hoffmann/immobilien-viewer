@@ -8,6 +8,7 @@ import io
 
 from django.db.models import Q
 from rest_framework.parsers import JSONParser
+from selenium.webdriver.support.expected_conditions import element_located_selection_state_to_be
 
 from ImmobilienViewer.serializers import ImmobilienSerializer
 from core.models import Immobilie, Region
@@ -83,7 +84,10 @@ def update_all_regions():
                         immobilie._meta.auto_created = True
                         immobilie.save()
                         immobilie._meta.auto_created = False
-                        return f"Updated region {region} for {immobilie.title}"
+            else:
+                handle_failed_django_task.delay(
+                    f"Nominatim response {response.status_code}. {immobilie.title} not a dictionary")
+
         else:
             handle_failed_django_task.delay(
                 f"Nominatim response {response.status_code}  Reverse query failed for map location {immobilie.lat_lng}")
@@ -124,6 +128,9 @@ def update_immobilie_regions(immobilie_uuid):
                         immobilie._meta.auto_created = True
                         immobilie.save()
                         immobilie._meta.auto_created = False
+            else:
+                handle_failed_django_task.delay(
+                    f"Nominatim response {response.status_code}. {immobilie.title} not a dictionary")
         else:
             handle_failed_django_task.delay(
                 f"Nominatim response {response.status_code}  Reverse query failed for map location {immobilie.lat_lng}")

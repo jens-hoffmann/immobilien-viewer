@@ -31,29 +31,34 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(","
 
 # Application definition
 
-INSTALLED_APPS = [
+CONTRIB_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+EXTERNAL_APPS = [
     'django.contrib.gis',
-    # External Apps
     'rest_framework',
     'drf_standardized_errors',
     'django_bootstrap5',
     'crispy_forms',
     'crispy_bootstrap5',
     'haystack',
-    # Internal Apps
+    'debug_toolbar',
+]
+INTERNAL_APPS = [
     'core',
     'ImmobilienViewer',
     'DjangoCelery',
-
 ]
 
+INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + INTERNAL_APPS
+
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -145,3 +150,15 @@ REST_FRAMEWORK = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    "localhost"
+]
+
+def show_toolbar(request):
+    return True
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
+}
