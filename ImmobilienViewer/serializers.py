@@ -14,13 +14,21 @@ class ImmobilienResourceSerializer(serializers.ModelSerializer):
         fields = ['uuid', 'name', 'base_url', 'crawler']
         read_only_fields = ['uuid']
 
+class RegionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Region
+        fields = ['uuid', 'name']
+        read_only_fields = ['uuid']
+
 class ImmobilienSerializer(serializers.ModelSerializer):
 
     resource = ImmobilienResourceSerializer()
+    regions = RegionSerializer(read_only=True, many=True)
 
     class Meta:
         model = Immobilie
-        fields = ['uuid', 'title', 'description', 'provider', 'provider_id', 'price', 'url', 'location', 'type', 'resource']
+        fields = ['uuid', 'title', 'description', 'provider', 'provider_id', 'price', 'url', 'location', 'type', 'resource', 'regions']
         read_only_fields = ['uuid']
 
     def create(self, validated_data):

@@ -51,7 +51,7 @@ $(document).ready(function() {
 	}).catch(error => console.log(error.message));
 
 	var lankreiseGeoJSON = false;
-	fetch('/static/gemeinden_simplify20.geojson',{
+	fetch('/static/landkreise_simplify20.geojson',{
 				method: 'GET'
 			})
 			.then(response => response.json())

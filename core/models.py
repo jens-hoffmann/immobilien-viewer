@@ -64,9 +64,9 @@ class Immobilie(models.Model):
     deleted = models.BooleanField(default=False)
     type = models.CharField(max_length=10, choices=IMMOBIEN_TYPES)
 
-    region = models.ForeignKey(Region, on_delete=models.PROTECT, null=True, blank=True)
     resource = models.ForeignKey(ImmobilienResource, on_delete=models.PROTECT, null=True, blank=True)
-    tags = models.ManyToManyField('Tag', blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    regions = models.ManyToManyField(Region, blank=True)
 
     @property
     def lat_lng(self):
