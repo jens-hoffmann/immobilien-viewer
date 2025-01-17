@@ -2,7 +2,8 @@ from rest_framework import serializers
 from rest_framework_gis.fields import GeometrySerializerMethodField
 from rest_framework_gis.serializers import GeoFeatureModelSerializer, GeoModelSerializer
 from django.contrib.gis.geos import Point
-
+from taggit.serializers import (TagListSerializerField,
+                                TaggitSerializer)
 
 from ImmobilienViewer.exceptions import ImmoblilieExistsException
 from core.models import Immobilie, Region, ImmobilienResource
@@ -21,14 +22,15 @@ class RegionSerializer(serializers.ModelSerializer):
         fields = ['uuid', 'name']
         read_only_fields = ['uuid']
 
-class ImmobilienSerializer(serializers.ModelSerializer):
+class ImmobilienSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     resource = ImmobilienResourceSerializer()
-    regions = RegionSerializer(read_only=True, many=True)
+    tags = TagListSerializerField(required=False)
+    regions = RegionSerializer(read_only=True, many=True, required=False)
 
     class Meta:
         model = Immobilie
-        fields = ['uuid', 'title', 'description', 'provider', 'provider_id', 'price', 'url', 'location', 'type', 'resource', 'regions']
+        fields = ['uuid', 'title', 'description', 'provider', 'provider_id', 'price', 'url', 'location', 'type', 'resource', 'regions', 'tags']
         read_only_fields = ['uuid']
 
     def create(self, validated_data):

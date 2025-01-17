@@ -1,13 +1,13 @@
 from django import forms
 
-from core.models import Region, Immobilie, Tag, FileAttachment, District
+from core.models import Region, Immobilie, FileAttachment, District
 
 
 class AddRegionForm(forms.ModelForm):
 
     class Meta:
         model = Region
-        exclude = ['uuid', 'tags']
+        exclude = ['uuid']
 
     name = forms.CharField(widget=forms.TextInput())
     districts = forms.ModelMultipleChoiceField(
@@ -21,13 +21,6 @@ class ImmobilieForm(forms.ModelForm):
     class Meta:
         model = Immobilie
         fields = ('title', 'description', 'provider','provider_id', 'price', 'url', 'location')
-
-
-class AddTagForm(forms.ModelForm):
-
-    class Meta:
-        model = Tag
-        fields = ('name',)
 
 
 class AttachmentForm(forms.ModelForm):

@@ -10,10 +10,15 @@
             <p class="lead">List of saved plot and house offers</p>
             <div class="my-5">
                 {% for tag in tags %}
-                    <a href="{% url 'immoviewer:immo-tagged-list' tag.slug %}" class="btn btn-outline-secondary">{{ tag.name }}</a>
+                    {% if tag.slug == tag_slug %}
+                        <a href="{% url 'immoviewer:immo-tagged-list' tag.slug %}" class="btn btn-secondary">{{ tag.name }}</a>
+                    {% else %}
+                        <a href="{% url 'immoviewer:immo-tagged-list' tag.slug %}" class="btn btn-outline-secondary">{{ tag.name }}</a>
+                    {% endif %}
                 {% empty %}
                     <p>No tags</p>
                 {% endfor %}
+                <a href="{% url 'immoviewer:immo-list' %}" class="btn btn-primary">All</a>
             </div>
         </div>
         <div class="py-5">

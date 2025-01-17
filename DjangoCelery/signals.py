@@ -11,8 +11,7 @@ from DjangoCelery.tasks import update_map_locations, update_all_regions, update_
 def update_map_location_for_adress(sender, instance,  **kwargs):
     logger = logging.getLogger("DjangoCelery.signal")
     logger.info(f"Signal post_save from Immobilie {sender} for instance {instance}")
-    task_chain = chain(update_map_locations.s(instance.uuid),  update_immobilie_regions.s(instance.uuid))()
-    task_chain.apply_async()
+    result = chain(update_map_locations.s(instance.uuid),  update_immobilie_regions.s(instance.uuid))()
 
 @receiver(pre_delete, sender=FileAttachment)
 def delete_attachment_file(sender, instance,  **kwargs):

@@ -1,5 +1,6 @@
 from django.core.serializers import serialize
 from django.db.models.query import EmptyQuerySet
+from django.http import JsonResponse, Http404
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView
 from haystack.forms import SearchForm
@@ -10,8 +11,9 @@ from django.contrib import messages
 from rest_framework.generics import ListAPIView
 
 from ImmobilienViewer import serializers
-from ImmobilienViewer.forms import AddRegionForm, ImmobilieForm, AddTagForm, AttachmentForm
-from core.models import Immobilie, Region, Tag, FileAttachment
+from ImmobilienViewer.forms import AddRegionForm, ImmobilieForm, AttachmentForm
+from core.models import Immobilie, Region, FileAttachment
+from taggit.models import Tag
 
 
 class ImmobilienDetailView(DetailView):
@@ -27,7 +29,9 @@ class ImmobilienDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         immo = Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+        context['alltags'] = Tag.objects.all()
         context['attachments'] = immo.attachments.all()
+        context['immotags'] = immo.tags.all()
         return context
 
 class ImmobilienListView(ListView):
@@ -37,7 +41,25 @@ class ImmobilienListView(ListView):
     context_object_name = 'immobilien'
     paginate_by = 9
     queryset = Immobilie.objects.order_by('-location')
-    extra_context = {'active': 'list'}
+    extra_context = {'active': 'list', 'tags': Tag.objects.all()}
+
+
+class TaggedImmobilienListView(ListView):
+
+    model = Immobilie
+    template_name = "immo_tagged_list.html"
+    context_object_name = 'immobilien'
+    paginate_by = 9
+
+    def get_queryset(self):
+        return Immobilie.objects.filter(tags__slug=self.kwargs.get('tag_slug')).order_by('-location')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['active'] = 'list'
+        context['tags'] = Tag.objects.all()
+        context['tag_slug'] = self.kwargs.get('tag_slug')
+        return context
 
 class RegionListView(ListView):
 
@@ -58,7 +80,7 @@ class CreateRegionView(CreateView):
 
     model = Region
     form_class = AddRegionForm
-    template_name = 'region_form.html'
+    template_name = 'forms/region_form.html'
     extra_context = {'title': 'Create a new region', 'active': 'create'}
 
     def get_success_url(self):
@@ -68,7 +90,7 @@ class CreateImmobilieView(CreateView):
 
     model = Immobilie
     form_class = ImmobilieForm
-    template_name = 'immobilie_form.html'
+    template_name = 'forms/immobilie_form.html'
     extra_context = {'title': 'Create a new Immobilie', 'active': 'create'}
 
     def get_success_url(self):
@@ -78,7 +100,7 @@ class UpdateImmobilieView(UpdateView):
 
     model = Immobilie
     form_class = ImmobilieForm
-    template_name = 'immobilie_form.html'
+    template_name = 'forms/immobilie_form.html'
     extra_context = {'title': 'Update existing Immobilie', 'active': 'edit'}
 
     def get_success_url(self):
@@ -92,20 +114,12 @@ class UpdateImmobilieView(UpdateView):
         messages.success(self.request, "The immobilie was updated successfully.")
         return super(UpdateImmobilieView,self).form_valid(form)
 
-class CreateTagView(CreateView):
-
-    model = Tag
-    form_class = AddTagForm
-    template_name = 'immobilie_form.html'
-    success_url = '/immoviewer/list/'
-    extra_context = {'title': 'Create a new tag', 'active': 'create'}
-
 
 class UploadAttachmentView(CreateView):
 
     model = FileAttachment
     form_class = AttachmentForm
-    template_name = 'upload_form.html'
+    template_name = 'forms/upload_form.html'
 
     def get_success_url(self):
         url = reverse('immoviewer:immo-list-attachments', kwargs={'uuid': self.kwargs['uuid']})
@@ -135,7 +149,7 @@ class AttachmentListView(ListView):
 class DeleteAttachmentView(DeleteView):
 
     model = FileAttachment
-    template_name = 'attachment_confirm_delete.html'
+    template_name = 'forms/attachment_confirm_delete.html'
     context_object_name = 'attachment'
 
     def get_queryset(self):
@@ -163,7 +177,7 @@ class DeleteAttachmentView(DeleteView):
 
 class ImmoSearchView(SearchView):
 
-    template_name = 'search.html'
+    template_name = 'search/search.html'
     form_class = SearchForm
 
     def get_queryset(self):
@@ -196,3 +210,16 @@ class GeoJSONAPIView(ListAPIView):
 
     queryset = Immobilie.objects.filter(map_location__isnull=False)
     serializer_class = serializers.ImmobilieLocationSerializer
+
+
+def tag_immobilie(request):
+    if request.POST.get('action') == 'post':
+        immobilie_uuid = request.POST.get('immobilie')
+        tagname = request.POST.get('tagname')
+        immobilie = Immobilie.objects.filter(uuid=immobilie_uuid)[0]
+        immobilie.tags.add(tagname)
+        immobilie._meta.auto_created = True
+        immobilie.save()
+        immobilie._meta.auto_created = False
+        return JsonResponse({'result': tagname})
+

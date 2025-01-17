@@ -9,9 +9,6 @@
   href="{% static 'map.css' %}"/>
 {% endblock css %}
 
-{% block js %}
-{% endblock js %}
-
 
 {% block content %}
 <div class="container my-5">
@@ -20,6 +17,21 @@
     {% if attachments|length > 0 %}
     <a class="btn btn-secondary" href="{% url 'immoviewer:immo-list-attachments' immobilie.uuid %}" role="button">List attachments</a>
     {% endif %}
+    <div class="my-5">
+        {% csrf_token %}
+        <select class="form-control" id="tags-selection"  multiple="multiple">
+
+            {% for tag in alltags %}
+                {% if tag in immotags %}
+                    <option value="{{ tag.id }}" selected="selected">{{ tag.name }}</option>
+                {% else %}
+                    <option value="{{ tag.id }}">{{ tag.name }}</option>
+                {% endif %}
+            {% endfor %}
+
+        </select>
+
+    </div>
 
   <div class="p-5 text-left bg-body-tertiary rounded-3">
     <h1 class="text-body-emphasis text-center">{{immobilie.title}}</h1>
@@ -50,3 +62,43 @@
 {% endif %}
 
 {% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function() {
+    $('#tags-selection').select2({
+        tags: true,
+        tokenSeparators: [",", " "],
+        createTag: function (tag) {
+            return {
+                id: tag.term,
+                text: tag.term,
+                isNew : true
+            };
+        }
+    }).on("select2:select", function(e) {
+        if(e.params.data.isNew){
+            console.log("New tag: " + e.params.data.id + ":" + e.params.data.text);
+            $.ajax({
+                  type: 'POST',
+                  url: '{% url "immoviewer:tag-immo" %}',
+                  data: {
+                    immobilie: "{{ immobilie.uuid }}",
+                    tagname: e.params.data.text,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    action: 'post'
+                  },
+                  success: function (json) {
+                    console.log("Success: " + json);
+                  },
+                  error: function (xhr, errmsg, err) {
+                    console.log("Error: " + errmsg);
+                  }
+                });
+            //$(this).find('[value="'+e.params.data.id+'"]').replaceWith('<option selected value="'+e.params.data.id+'">'+e.params.data.text+'</option>');
+        }
+    });
+
+});
+</script>
+{% endblock js %}

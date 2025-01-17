@@ -2,16 +2,18 @@ import uuid
 
 from django.contrib.gis.db.models import PointField
 from django.db import models
+from taggit.managers import TaggableManager
+from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
+from django.utils.translation import gettext_lazy as _
 
+class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
+    # If you only inherit GenericUUIDTaggedItemBase, you need to define
+    # a tag field. e.g.
+    # tag = models.ForeignKey(Tag, related_name="uuid_tagged_items", on_delete=models.CASCADE)
 
-class Tag(models.Model):
-    name = models.CharField(max_length=100, null=False, blank=False)
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
+    class Meta:
+        verbose_name = _("Tag")
+        verbose_name_plural = _("Tags")
 
 class District(models.Model):
     name = models.CharField(max_length=100, blank=False, null=False)
@@ -22,7 +24,6 @@ class District(models.Model):
 
 class Region(models.Model):
     name = models.CharField(max_length=100, blank=False, null=False)
-    tags = models.ManyToManyField(Tag, blank=True)
     districts = models.ManyToManyField(District, blank=False)
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -65,8 +66,9 @@ class Immobilie(models.Model):
     type = models.CharField(max_length=10, choices=IMMOBIEN_TYPES)
 
     resource = models.ForeignKey(ImmobilienResource, on_delete=models.PROTECT, null=True, blank=True)
-    tags = models.ManyToManyField(Tag, blank=True)
     regions = models.ManyToManyField(Region, blank=True)
+
+    tags = TaggableManager(through=UUIDTaggedItem)
 
     @property
     def lat_lng(self):

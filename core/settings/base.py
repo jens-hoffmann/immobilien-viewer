@@ -39,7 +39,7 @@ CONTRIB_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
-EXTERNAL_APPS = [
+THIRD_PARTY_APPS = [
     'django.contrib.gis',
     'rest_framework',
     'drf_standardized_errors',
@@ -48,6 +48,7 @@ EXTERNAL_APPS = [
     'crispy_bootstrap5',
     'haystack',
     'debug_toolbar',
+    'taggit',
 ]
 INTERNAL_APPS = [
     'core',
@@ -55,7 +56,7 @@ INTERNAL_APPS = [
     'DjangoCelery',
 ]
 
-INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + INTERNAL_APPS
+INSTALLED_APPS = CONTRIB_APPS + THIRD_PARTY_APPS + INTERNAL_APPS
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -162,3 +163,5 @@ def show_toolbar(request):
 DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
 }
+
+TAGGIT_CASE_INSENSITIVE = True
