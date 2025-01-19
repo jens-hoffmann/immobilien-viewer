@@ -20,7 +20,15 @@ class Command(BaseCommand):
             with open(path) as fobj:
                 json_obj = json.load(fobj)
                 try:
+                    first_entry = json_obj["features"][0]["properties"]["GEN"]
+                    self.stdout.write(f"Check if first entry already in database: {first_entry}")
+                    result_list =District.objects.filter(name=first_entry)
+                    if len(result_list) > 0:
+                        self.stdout.write(f"First entry already in database: {first_entry}. Skip import.")
+                        return None
+
                     for feature in json_obj["features"]:
+
                         district = District(name=feature["properties"]["GEN"])
                         district.full_clean()
                         batch.append(district)

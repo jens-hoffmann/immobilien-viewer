@@ -1,6 +1,6 @@
 from django.core.serializers import serialize
 from django.db.models.query import EmptyQuerySet
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponse
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView
 from haystack.forms import SearchForm
@@ -9,6 +9,7 @@ from rest_framework import viewsets, generics
 
 from django.contrib import messages
 from rest_framework.generics import ListAPIView
+from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED, HTTP_400_BAD_REQUEST
 
 from ImmobilienViewer import serializers
 from ImmobilienViewer.forms import AddRegionForm, ImmobilieForm, AttachmentForm
@@ -211,15 +212,39 @@ class GeoJSONAPIView(ListAPIView):
     queryset = Immobilie.objects.filter(map_location__isnull=False)
     serializer_class = serializers.ImmobilieLocationSerializer
 
+def remove_all_tags_without_objects():
+    for tag in Tag.objects.all():
+        if tag.taggit_taggeditem_items.count() == 0:
+            print('Removing: {}'.format(tag))
+            tag.delete()
+        else:
+            print('Keeping: {}'.format(tag))
+
+
 
 def tag_immobilie(request):
     if request.POST.get('action') == 'post':
-        immobilie_uuid = request.POST.get('immobilie')
-        tagname = request.POST.get('tagname')
-        immobilie = Immobilie.objects.filter(uuid=immobilie_uuid)[0]
-        immobilie.tags.add(tagname)
-        immobilie._meta.auto_created = True
-        immobilie.save()
-        immobilie._meta.auto_created = False
-        return JsonResponse({'result': tagname})
+        if request.POST.get('tagaction') == "add":
+            immobilie_uuid = request.POST.get('immobilie')
+            tagname = request.POST.get('tagname')
+            immobilie = Immobilie.objects.filter(uuid=immobilie_uuid)[0]
+            immobilie.tags.add(tagname)
+            immobilie._meta.auto_created = True
+            immobilie.save()
+            immobilie._meta.auto_created = False
+            return JsonResponse({'result': tagname})
+        elif request.POST.get('tagaction') == "remove":
+            immobilie_uuid = request.POST.get('immobilie')
+            tagname = request.POST.get('tagname')
+            immobilie = Immobilie.objects.filter(uuid=immobilie_uuid)[0]
+            immobilie.tags.remove(tagname)
+            immobilie._meta.auto_created = True
+            immobilie.save()
+            immobilie._meta.auto_created = False
+            remove_all_tags_without_objects()
+            return JsonResponse({'result': tagname})
+        else:
+            return HttpResponse(status=HTTP_400_BAD_REQUEST)
+    else:
+        return HttpResponse(status=HTTP_405_METHOD_NOT_ALLOWED)
 

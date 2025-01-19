@@ -85,6 +85,7 @@ $(document).ready(function() {
                   data: {
                     immobilie: "{{ immobilie.uuid }}",
                     tagname: e.params.data.text,
+                    tagaction: "add",
                     csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     action: 'post'
                   },
@@ -97,6 +98,25 @@ $(document).ready(function() {
                 });
             //$(this).find('[value="'+e.params.data.id+'"]').replaceWith('<option selected value="'+e.params.data.id+'">'+e.params.data.text+'</option>');
         }
+    }).on("select2:unselecting", function(e) {
+        console.log("Unselecting " + e.params.args.data.id + " : " + e.params.args.data.text);
+            $.ajax({
+                  type: 'POST',
+                  url: '{% url "immoviewer:tag-immo" %}',
+                  data: {
+                    immobilie: "{{ immobilie.uuid }}",
+                    tagname: e.params.args.data.text,
+                    tagaction: "remove",
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    action: 'post'
+                  },
+                  success: function (json) {
+                    console.log("Success: " + json);
+                  },
+                  error: function (xhr, errmsg, err) {
+                    console.log("Error: " + errmsg);
+                  }
+                });
     });
 
 });
