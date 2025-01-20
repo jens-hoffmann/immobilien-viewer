@@ -1,6 +1,6 @@
 from django.core.serializers import serialize
 from django.db.models.query import EmptyQuerySet
-from django.http import JsonResponse, Http404, HttpResponse
+from django.http import JsonResponse, Http404, HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView
 from haystack.forms import SearchForm
@@ -41,7 +41,7 @@ class ImmobilienListView(ListView):
     template_name = "immo_list.html"
     context_object_name = 'immobilien'
     paginate_by = 9
-    queryset = Immobilie.objects.order_by('-location')
+    queryset = Immobilie.objects.filter(deleted=False).order_by('-location')
     extra_context = {'active': 'list', 'tags': Tag.objects.all()}
 
 
@@ -53,7 +53,7 @@ class TaggedImmobilienListView(ListView):
     paginate_by = 9
 
     def get_queryset(self):
-        return Immobilie.objects.filter(tags__slug=self.kwargs.get('tag_slug')).order_by('-location')
+        return Immobilie.objects.filter(deleted=False).filter(tags__slug=self.kwargs.get('tag_slug')).order_by('-location')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -114,6 +114,24 @@ class UpdateImmobilieView(UpdateView):
     def form_valid(self, form):
         messages.success(self.request, "The immobilie was updated successfully.")
         return super(UpdateImmobilieView,self).form_valid(form)
+
+
+class DeleteImmobilieView(DeleteView):
+
+    model = Immobilie
+    context_object_name = 'immobilie'
+    template_name = 'forms/immobilie_confirm_delete_form.html'
+
+    def get_object(self, *args, **kwargs):
+        return Immobilie.objects.filter(uuid=self.kwargs.get('uuid'))[0]
+
+    def get_success_url(self):
+        return reverse('immoviewer:immo-list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "The task was deleted successfully.")
+        return super(DeleteImmobilieView,self).form_valid(form)
+
 
 
 class UploadAttachmentView(CreateView):

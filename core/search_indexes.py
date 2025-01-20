@@ -12,4 +12,4 @@ class ImmobilienIndex(indexes.SearchIndex, indexes.Indexable):
         return Immobilie
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        return self.get_model().objects.filter(deleted=False)

@@ -17,6 +17,7 @@
     {% if attachments|length > 0 %}
     <a class="btn btn-secondary" href="{% url 'immoviewer:immo-list-attachments' immobilie.uuid %}" role="button">List attachments</a>
     {% endif %}
+    <a class="btn btn-danger" href="{% url 'immoviewer:immo-delete-immobilie' immobilie.uuid %}" role="button">Delete</a>
     <div class="my-5">
         {% csrf_token %}
         <select class="form-control" id="tags-selection"  multiple="multiple">

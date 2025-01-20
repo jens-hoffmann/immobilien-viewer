@@ -77,6 +77,11 @@ class Immobilie(models.Model):
     def __str__(self):
         return self.title
 
+    def delete(self, using=None, keep_parents=False):
+        self.deleted = True
+        self.save()
+
+
 class FileAttachment(models.Model):
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

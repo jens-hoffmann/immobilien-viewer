@@ -16,6 +16,7 @@ urlpatterns = [
     path('region/create/', CreateRegionView.as_view(), name='immo-create-region'),
     path('immobilie/create', CreateImmobilieView.as_view(), name='immo-create-immobilie'),
     path('immobilie/update/<uuid:uuid>/', UpdateImmobilieView.as_view(), name='immo-update-immobilie'),
+    path('immobilie/delete/<uuid:uuid>/', DeleteImmobilieView.as_view(), name='immo-delete-immobilie'),
     path('immobilie/attachments/list/<uuid:uuid>/', AttachmentListView.as_view(), name='immo-list-attachments'),
     path('immobilie/attachment/upload/<uuid:uuid>/', UploadAttachmentView.as_view(), name='immo-upload-attachment'),
     path('immobilie/attachment/delete/<uuid:uuid>/', DeleteAttachmentView.as_view(), name='immo-delete-attachment'),
