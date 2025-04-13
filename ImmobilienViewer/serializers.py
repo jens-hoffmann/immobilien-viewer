@@ -22,6 +22,7 @@ class RegionSerializer(serializers.ModelSerializer):
         fields = ['uuid', 'name']
         read_only_fields = ['uuid']
 
+
 class ImmobilienSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     resource = ImmobilienResourceSerializer()
